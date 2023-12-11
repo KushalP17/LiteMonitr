@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 BLE App</title>
+</head>
+<body>
+    <h1>ESP32 BLE App</h1>
+    <button onclick="connect()">Connect</button>
+    <button onclick="disconnect()">Disconnect</button>
+    <br>
+    <button onclick="writeValue(1)">Option 1</button>
+    <br>
+    <button onclick="writeValue(2)">Option 2</button>
+    <br>
+    <button onclick="writeValue(3)">Option 3</button>
+    <br>
+    <button onclick="writeValue(4)">Option 4</button>
+    <br>
+    <button onclick="writeValue(5)">Option 5</button>
+    <br>
+
+
+    <script>
+        let device;
+        let characteristic;
+
+        async function connect() {
+            try {
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b'] }]
+                });
+
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
+                characteristic = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
+
+                // Your code to interact with the characteristic goes here
+                // For example, reading/writing values or listening for notifications
+            } catch (error) {
+                console.error('Error connecting:', error);
+            }
+        }
+
+        function disconnect() {
+            if (device && device.gatt.connected) {
+                device.gatt.disconnect();
+            }
+        }
+
+        async function writeValue(x) {
+            if(characteristic && device.gatt.connected){            
+                try {
+                    await characteristic.writeValue(new Uint8Array([x]));
+                    console.log('Value written successfully');
+                    console.log(characteristic.getValue());
+                } catch (error) {
+                    console.error('Error writing:', error);
+                }
+            }else{
+                console.error('Device not connected or characteristic unavailable');
+            }
+        }
+    </script>
+</body>
+</html>
