@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESP32 BLE App</title>
+    <style>
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(32, 10px);
+            grid-template-rows: repeat(64, 10px);
+            gap: 1px;
+        }
+
+        .cell {
+            width: 10px;
+            height: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <h1>ESP32 BLE App</h1>
@@ -27,6 +42,13 @@
     <br>
     <button onclick="writeValue(7)">Increase Brightness</button>
     <br>
+
+
+    <input type="color" id="colorPicker" value="#ffffff">
+    <button onclick="activatePencil()">Pencil</button>
+    <button onclick="clearGrid()">Clear Grid</button>
+
+    <div id="grid"></div>
 
 
     <script>
@@ -69,6 +91,77 @@
                 console.error('Device not connected or characteristic unavailable');
             }
         }
+
+
+
+        let isPencilActive = false;
+        let isDrawing = true;
+        let selectedColor = '#000000';
+
+        function activatePencil() {
+            isPencilActive = true;
+        }
+
+        function clearGrid() {
+            const cells = document.querySelectorAll('.cell');
+            cells.forEach(cell => {
+                cell.style.backgroundColor = '#000000';
+            });
+        }
+
+        function createGrid() {
+            const grid = document.getElementById('grid');
+            for (let i = 0; i < 32; i++) {
+                for (let j = 0; j < 64; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.addEventListener('mousedown', handleCellMouseDown);
+                    cell.addEventListener('mouseover', handleCellHover);
+                    grid.appendChild(cell);
+                }
+            }
+            //document.addEventListener('mouseup', () => {
+            //    isDrawing = false;
+            //});
+        }
+
+        function handleCellMouseDown(event) {
+            if (isPencilActive) {
+                isDrawing = true;
+                handleCellClick(event);
+                console.log("mouse is down");
+            }
+        }
+
+        function handleCellClick(event) {
+            if (isDrawing) {
+                const cell = event.target;
+                cell.style.backgroundColor = selectedColor;
+                cell.addEventListener('mouseover', handleCellHover);
+                document.addEventListener('mouseup', () => {
+                    cell.removeEventListener('mouseover', handleCellHover);
+                });
+
+            }
+        }
+
+        function handleCellHover(event) {
+            if (isDrawing) {
+                const cell = event.target;
+                console.log("cell drawn");
+                cell.style.backgroundColor = selectedColor;
+            }
+        }
+
+        function updateSelectedColor() {
+            selectedColor = document.getElementById('colorPicker').value;
+        }
+
+        // Initialize the grid when the page loads
+        window.onload = function () {
+            createGrid();
+            document.getElementById('colorPicker').addEventListener('input', updateSelectedColor);
+        };
     </script>
 </body>
 </html>
