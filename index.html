@@ -17,6 +17,7 @@
             height: 10px;
             border: 1px solid #ccc;
             cursor: pointer;
+            background-color: black;
         }
     </style>
 </head>
@@ -95,8 +96,8 @@
 
 
         let isPencilActive = false;
-        let isDrawing = true;
-        let selectedColor = '#000000';
+        let isDrawing = false;
+        let selectedColor = '#ffffff';
 
         function activatePencil() {
             isPencilActive = true;
@@ -117,6 +118,7 @@
                     cell.classList.add('cell');
                     cell.addEventListener('mousedown', handleCellMouseDown);
                     cell.addEventListener('mouseover', handleCellHover);
+                    cell.addEventListener('touchstart', handleCellMouseDown);
                     grid.appendChild(cell);
                 }
             }
@@ -126,6 +128,7 @@
         }
 
         function handleCellMouseDown(event) {
+            //event.preventDefault();
             if (isPencilActive) {
                 isDrawing = true;
                 handleCellClick(event);
@@ -140,6 +143,7 @@
                 cell.addEventListener('mouseover', handleCellHover);
                 document.addEventListener('mouseup', () => {
                     cell.removeEventListener('mouseover', handleCellHover);
+                    isDrawing = false;
                 });
 
             }
@@ -161,6 +165,19 @@
         window.onload = function () {
             createGrid();
             document.getElementById('colorPicker').addEventListener('input', updateSelectedColor);
+
+            document.addEventListener('touchmove', function(event) {
+                // Check if we are drawing and prevent scrolling
+                if (isDrawing) {
+                    event.preventDefault;
+                }
+
+                // Handle the touch move for each cell
+                const touches = event.targetTouches;
+                for (let i = 0; i < touches.length; i++) {
+                    handleCellHover(touches[i]);
+                }
+            });
         };
     </script>
 </body>
