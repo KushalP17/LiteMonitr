@@ -49,6 +49,7 @@ BLECharacteristic* pCharacteristic = NULL;
 bool deviceConnected = false;
 bool newDataAvailable = false;
 uint8_t receivedValue = 0;
+std::string value;
 
 class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -62,9 +63,11 @@ class MyServerCallbacks : public BLEServerCallbacks {
 
 class MyCharacteristicCallbacks : public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic* pCharacteristic) {
-        std::string value = pCharacteristic->getValue();
+        value = pCharacteristic->getValue();
         if (value.length() > 0) {
             receivedValue = value[0];
+            //Serial.println(value.c_str());
+            //Serial.println(value.length());
             newDataAvailable = true;
         }
     }
@@ -121,6 +124,79 @@ void draw32x32(const uint8_t sample[][32][3]) {
   ws2812b.show();
 }
 
+void drawSinglePixel(uint8_t row, uint8_t col, uint8_t R, uint8_t G, uint8_t B){
+  int pixel;
+
+  int rowMod16 = row % 16;
+  int colMod2 = col % 2;
+  int rowby8 = row / 8;
+  int pixOnPanel = 256*rowby8; //pix 0 on panel
+
+
+  if(rowMod16 < 8){
+    if(colMod2){
+      pixOnPanel += (8*col); //top pix on column
+      pixel = pixOnPanel + (7-rowMod16); //correct pix w/ row and col
+    }else{
+      pixOnPanel += (8*col); //top pix on column
+      pixel = pixOnPanel + rowMod16; //correct pix w/ row and col
+    }
+  }else{
+    if(colMod2){
+      pixOnPanel += (8*(31-col)); //top pix on column
+      pixel = pixOnPanel + (15-rowMod16); //correct pix w/ row and col
+    }else{
+      pixOnPanel += (8*(31-col)); //top pix on column
+      pixel = pixOnPanel + (rowMod16-8); //correct pix w/ row and col
+    }
+  }
+
+  ws2812b.setPixelColor(pixel, ws2812b.Color(round(R*brightness), round(G*brightness), round(B*brightness)));
+  ws2812b.show();
+}
+
+/*
+void liveCanvas(){
+  int marker = 0;
+  int row, col, R, G, B;
+  while(deviceConnected){
+    if (newDataAvailable) {
+            Serial.println("Received value: " + String(receivedValue));
+            int data = String(receivedValue).toInt();
+
+            switch(marker){
+              case 0:
+                row = data;
+                break;
+              case 1:
+                col = data;
+                break;
+              case 2:
+                R = data;
+                break;
+              case 3:
+                G = data;
+                break;
+              case 4:
+                B = data;
+                break;
+            }
+
+            marker++;
+
+            if(marker == 5){
+              marker = 0;
+              drawSinglePixel(row,col,R,G,B);
+            }
+
+            // Reset the flag
+            newDataAvailable = false;
+        }
+      delay(10);
+  }
+}
+*/
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -168,21 +244,25 @@ void loop() {
 
         // Check if there's new data available
         if (newDataAvailable) {
+          if(value.length() == 1){
             Serial.println("Received value: " + String(receivedValue));
 
             int preOption = String(receivedValue).toInt();
 
             if(preOption == 6){
-              brightness -= .1;
+              brightness -= .05;
               if(brightness < 0) brightness = 0;
             }else if(preOption == 7){
-              brightness += .1;
+              brightness += .05;
               if(brightness > 1) brightness = 1;
             }else{
               option = String(receivedValue).toInt();
             }
 
-            
+            if(option == 0){ 
+              ws2812b.clear();
+              ws2812b.show();
+            }
 
             switch(option){
               case 1:
@@ -201,9 +281,26 @@ void loop() {
                 draw64x32(stickman);
                 break;
             }
-            // Reset the flag
+          }else if(value.length() == 5){
+            uint8_t row = value[0];
+            //row = String(row).toInt();
+            uint8_t col = value[1];
+            //col = String(col).toInt();
+            uint8_t R = value[2];
+            //R = String(R).toInt();
+            uint8_t G = value[3];
+            //G = String(G).toInt();
+            uint8_t B = value[4];
+            //B = String(B).toInt();
+
+            Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String(row) + ", " + String(col));
+
+            drawSinglePixel(row,col,R,G,B);
+
+          }
+          // Reset the flag
             newDataAvailable = false;
         }
     }
-    delay(10);
+    delay(5);
 }

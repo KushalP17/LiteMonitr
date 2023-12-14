@@ -43,6 +43,11 @@
     <br>
     <button onclick="writeValue(7)">Increase Brightness</button>
     <br>
+    <!-- <button onclick="writeValue(256)">Test Button</button> -->
+    <br>
+    <br>
+    <br>
+    <br>
 
 
     <input type="color" id="colorPicker" value="#ffffff">
@@ -82,9 +87,30 @@
         async function writeValue(x) {
             if(characteristic && device.gatt.connected){            
                 try {
+                    //sleep(100);
                     await characteristic.writeValue(new Uint8Array([x]));
-                    console.log('Value written successfully');
+                    //sleep(100);
+                    console.log('Value of ' + x + ' written successfully');
                     console.log(characteristic.getValue());
+                    
+                } catch (error) {
+                    console.error('Error writing:', error);
+                }
+            }else{
+                console.error('Device not connected or characteristic unavailable');
+            }
+        }
+
+        async function writePixel(row, col, R, G, B) {
+            if(characteristic && device.gatt.connected){            
+                try {
+                    //sleep(100);
+                    //let x = new Uint8Array([row, col, R, G, B]);
+                    await characteristic.writeValue(new Uint8Array([row, col, R, G, B]));
+                    //sleep(100);
+                    console.log('Value of ' + R + ', ' + G + ', ' + B + ' written successfully');
+                    console.log(characteristic.getValue());
+                    
                 } catch (error) {
                     console.error('Error writing:', error);
                 }
@@ -101,6 +127,7 @@
 
         function activatePencil() {
             isPencilActive = true;
+            writeValue(8);
         }
 
         function clearGrid() {
@@ -108,17 +135,21 @@
             cells.forEach(cell => {
                 cell.style.backgroundColor = '#000000';
             });
+            writeValue(0);
         }
 
         function createGrid() {
             const grid = document.getElementById('grid');
-            for (let i = 0; i < 32; i++) {
-                for (let j = 0; j < 64; j++) {
+            for (let i = 0; i < 64; i++) {
+                for (let j = 0; j < 32; j++) {
                     const cell = document.createElement('div');
+                    cell.setAttribute("col", j);
+                    cell.setAttribute("row", i);
                     cell.classList.add('cell');
                     cell.addEventListener('mousedown', handleCellMouseDown);
                     cell.addEventListener('mouseover', handleCellHover);
                     cell.addEventListener('touchstart', handleCellMouseDown);
+                    cell.addEventListener('touchmove', handleCellTouchMove);
                     grid.appendChild(cell);
                 }
             }
@@ -132,14 +163,36 @@
             if (isPencilActive) {
                 isDrawing = true;
                 handleCellClick(event);
-                console.log("mouse is down");
+                //console.log("mouse is down @ ");
             }
+        }
+
+        function drawPixel(row, col, color){
+            let R = color.substring(1, 3);
+            let G = color.substring(3, 5);
+            let B = color.substring(5, 7);
+
+            console.log(R);
+
+            R = parseInt(R, 16);
+            G = parseInt(G, 16);
+            B = parseInt(B, 16);
+
+            console.log(R);
+
+            writePixel(row, col, R, G, B);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
         function handleCellClick(event) {
             if (isDrawing) {
                 const cell = event.target;
                 cell.style.backgroundColor = selectedColor;
+                console.log("cell drawn @ " + cell.getAttribute("row") + ", " + cell.getAttribute("col"));
+                drawPixel(cell.getAttribute("row"), cell.getAttribute("col"), selectedColor);
                 cell.addEventListener('mouseover', handleCellHover);
                 document.addEventListener('mouseup', () => {
                     cell.removeEventListener('mouseover', handleCellHover);
@@ -150,10 +203,27 @@
         }
 
         function handleCellHover(event) {
+            event.preventDefault;
             if (isDrawing) {
                 const cell = event.target;
-                console.log("cell drawn");
+                console.log("cell drawn @ " + cell.getAttribute("row") + ", " + cell.getAttribute("col"));
+                drawPixel(cell.getAttribute("row"), cell.getAttribute("col"), selectedColor);
                 cell.style.backgroundColor = selectedColor;
+            }
+        }
+
+        function handleCellTouchMove(event) {
+            event.preventDefault();
+            if (isDrawing) {
+                const touches = event.changedTouches;
+                for (let i = 0; i < touches.length; i++) {
+                    const touch = touches[i];
+                    const cell = document.elementFromPoint(touch.clientX, touch.clientY);
+                    if (cell && cell.classList.contains('cell')) {
+                        drawPixel(cell.getAttribute("row"), cell.getAttribute("col"), selectedColor);
+                        cell.style.backgroundColor = selectedColor;
+                    }
+                }
             }
         }
 
