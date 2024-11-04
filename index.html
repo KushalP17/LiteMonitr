@@ -58,8 +58,39 @@
 
 
     <script>
+        
+        
+        class Queue {
+            constructor() {
+                this.items = {}
+                this.frontIndex = 0
+                this.backIndex = 0
+            }
+            enqueue(item) {
+                this.items[this.backIndex] = item
+                this.backIndex++
+                return item + ' inserted'
+            }
+            dequeue() {
+                const item = this.items[this.frontIndex]
+                delete this.items[this.frontIndex]
+                this.frontIndex++
+                return item
+            }
+            peek() {
+                return this.items[this.frontIndex]
+            }
+            get printQueue() {
+                return this.items;
+            }
+        }
+        
         let device;
         let characteristic;
+        const BLEQueue = new Queue();
+        let fillPixArray = new Uint8Array([255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]);
+        let fillPixArrayLen = 0;
+        let prevColor = {R:0, G:0, B:0};
 
         async function connect() {
             try {
@@ -101,15 +132,78 @@
             }
         }
 
+        async function sendValue() {
+            while(BLEQueue.backIndex != BLEQueue.frontIndex){
+                let item = BLEQueue.dequeue();
+                // await characteristic.writeValue(item);
+                console.log(item);
+                sleep(200);
+            }
+        }
+
+        function emptyArray() {
+            if(fillPixArrayLen > 0){
+                BLEQueue.enqueue(fillPixArray);
+                resetFillPixArray();
+                sendValue();
+            }
+        }
+
+        setInterval(emptyArray, 200);
+
         async function writePixel(row, col, R, G, B) {
             if(characteristic && device.gatt.connected){            
                 try {
                     //sleep(100);
                     //let x = new Uint8Array([row, col, R, G, B]);
-                    await characteristic.writeValue(new Uint8Array([row, col, R, G, B]));
+
+                    let newColorFlag = false;
+                    
+                    // non-contiguous color
+                    if(prevColor.R != R || prevColor.G != G || prevColor.B != B){
+                        newColorFlag = true;
+
+                        // send out array as is
+                        if(fillPixArrayLen > 0){
+                            BLEQueue.enqueue(fillPixArray);
+                            resetFillPixArray();
+                        }
+                    }else{
+                        // contiguous color
+
+                        // already filled array?
+                        if(fillPixArrayLen >= 6){
+                            fillPixArray[fillPixArrayLen] = row;
+                            fillPixArray[fillPixArrayLen+1] = col;
+                            fillPixArrayLen += 2;
+                        }else{
+                            newColorFlag = true;
+                        }
+                    }
+
+                    if(fillPixArrayLen == 20){
+                        BLEQueue.enqueue(fillPixArray);
+                        resetFillPixArray();
+                    }
+
+                    if(newColorFlag){
+                        resetFillPixArray();
+                        fillPixArray[0] = 37;
+                        fillPixArray[1] = R;
+                        fillPixArray[2] = G;
+                        fillPixArray[3] = B;
+                        fillPixArray[4] = row;
+                        fillPixArray[5] = col;
+                        fillPixArrayLen = 6;
+                    }
+                    // await characteristic.writeValue(new Uint8Array([row, col, R, G, B]));
                     //sleep(100);
+
+                    sendValue();
+
+
                     console.log('Value of ' + R + ', ' + G + ', ' + B + ' written successfully');
-                    console.log(characteristic.getValue());
+                    // console.log(characteristic.getValue());
                     
                 } catch (error) {
                     console.error('Error writing:', error);
@@ -117,6 +211,11 @@
             }else{
                 console.error('Device not connected or characteristic unavailable');
             }
+        }
+
+        function resetFillPixArray(){
+            fillPixArray = new Uint8Array([255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]);
+            fillPixArrayLen = 0;
         }
 
 
@@ -172,15 +271,17 @@
             let G = color.substring(3, 5);
             let B = color.substring(5, 7);
 
-            console.log(R);
+            // console.log(R);
 
             R = parseInt(R, 16);
             G = parseInt(G, 16);
             B = parseInt(B, 16);
 
-            console.log(R);
+            // console.log(R);
 
             writePixel(row, col, R, G, B);
+
+            prevColor = {R:R, G:G, B:B};
         }
 
         function sleep(ms) {
@@ -190,14 +291,21 @@
         function handleCellClick(event) {
             if (isDrawing) {
                 const cell = event.target;
-                cell.style.backgroundColor = selectedColor;
-                console.log("cell drawn @ " + cell.getAttribute("row") + ", " + cell.getAttribute("col"));
-                drawPixel(cell.getAttribute("row"), cell.getAttribute("col"), selectedColor);
-                cell.addEventListener('mouseover', handleCellHover);
-                document.addEventListener('mouseup', () => {
-                    cell.removeEventListener('mouseover', handleCellHover);
-                    isDrawing = false;
-                });
+
+                if(cell.style.backgroundColor != selectedColor){
+
+                    cell.style.backgroundColor = selectedColor;
+                    console.log("cell drawn @ " + cell.getAttribute("row") + ", " + cell.getAttribute("col"));
+                    drawPixel(cell.getAttribute("row"), cell.getAttribute("col"), selectedColor);
+                    cell.addEventListener('mouseover', handleCellHover);
+                    document.addEventListener('mouseup', () => {
+                        cell.removeEventListener('mouseover', handleCellHover);
+                        isDrawing = false;
+                    });
+
+                }
+
+                
 
             }
         }
@@ -225,6 +333,10 @@
                     }
                 }
             }
+        }
+
+        function checkColor() {
+            return cell.style.backgroundColor == selectedColor;
         }
 
         function updateSelectedColor() {

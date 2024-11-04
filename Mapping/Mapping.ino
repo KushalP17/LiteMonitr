@@ -155,6 +155,36 @@ void drawSinglePixel(uint8_t row, uint8_t col, uint8_t R, uint8_t G, uint8_t B){
   ws2812b.show();
 }
 
+void setSinglePixel(uint8_t row, uint8_t col, uint8_t R, uint8_t G, uint8_t B){
+  int pixel;
+
+  int rowMod16 = row % 16;
+  int colMod2 = col % 2;
+  int rowby8 = row / 8;
+  int pixOnPanel = 256*rowby8; //pix 0 on panel
+
+
+  if(rowMod16 < 8){
+    if(colMod2){
+      pixOnPanel += (8*col); //top pix on column
+      pixel = pixOnPanel + (7-rowMod16); //correct pix w/ row and col
+    }else{
+      pixOnPanel += (8*col); //top pix on column
+      pixel = pixOnPanel + rowMod16; //correct pix w/ row and col
+    }
+  }else{
+    if(colMod2){
+      pixOnPanel += (8*(31-col)); //top pix on column
+      pixel = pixOnPanel + (15-rowMod16); //correct pix w/ row and col
+    }else{
+      pixOnPanel += (8*(31-col)); //top pix on column
+      pixel = pixOnPanel + (rowMod16-8); //correct pix w/ row and col
+    }
+  }
+
+  ws2812b.setPixelColor(pixel, ws2812b.Color(round(R*brightness), round(G*brightness), round(B*brightness)));
+}
+
 /*
 void liveCanvas(){
   int marker = 0;
@@ -281,21 +311,24 @@ void loop() {
                 draw64x32(stickman);
                 break;
             }
-          }else if(value.length() == 5){
-            uint8_t row = value[0];
-            //row = String(row).toInt();
-            uint8_t col = value[1];
-            //col = String(col).toInt();
-            uint8_t R = value[2];
-            //R = String(R).toInt();
-            uint8_t G = value[3];
-            //G = String(G).toInt();
-            uint8_t B = value[4];
-            //B = String(B).toInt();
+          }else if(value.length() == 20 && value[0] == 37){
+            uint8_t R = value[1];
+            uint8_t G = value[2];
+            uint8_t B = value[3];
 
-            Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String(row) + ", " + String(col));
+            uint8_t row = 4;
+            uint8_t col = 5;
 
-            drawSinglePixel(row,col,R,G,B);
+            // Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String(row) + ", " + String(col));
+
+            while(value[row] < 32 && value[col] < 64 && row < 20 && col < 20) {
+
+              setSinglePixel(value[row], value[col], R, G, B);
+              row += 2;
+              col += 2;
+            }
+
+            ws2812b.show();
 
           }
           // Reset the flag
