@@ -1,4 +1,17 @@
 # NeoPixelScreen
-ESP32-driven NeoPixel Panels controlled by JS WebApp via BLE - with use of ChatGPT
+ESP32-driven NeoPixel Panels controlled by JS WebApp via BLE
 
-*****Use of ChatGPT was only for initial setup of the bluetooth framework for Arduino and JS, other resources used include W3Schools, RandomNerdTutorials, Arduino Forums, etc.*****
+## Setup
+Insert Image of circuit and website here
+
+## Use
+How to use interface
+
+## Development
+Optimizations & Such
+
+## Future Developments
+Insert Plans
+
+
+*****Resources used include W3Schools, RandomNerdTutorials, Arduino Forums, ChatGPT, etc.*****
