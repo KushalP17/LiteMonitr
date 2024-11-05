@@ -1,4 +1,4 @@
-#include <Arduino.h>
+// #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -49,7 +49,7 @@ BLECharacteristic* pCharacteristic = NULL;
 bool deviceConnected = false;
 bool newDataAvailable = false;
 uint8_t receivedValue = 0;
-std::string value;
+String value;
 
 class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
@@ -235,7 +235,7 @@ void setup() {
   Serial.begin(115200);
 
     // Create the BLE Server
-    BLEDevice::init("YourESP32");
+    BLEDevice::init("LiteMonitr");
     pServer = BLEDevice::createServer();
     pServer->setCallbacks(new MyServerCallbacks());
 

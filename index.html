@@ -135,7 +135,7 @@
         async function sendValue() {
             while(BLEQueue.backIndex != BLEQueue.frontIndex){
                 let item = BLEQueue.dequeue();
-                // await characteristic.writeValue(item);
+                await characteristic.writeValue(item);
                 console.log(item);
                 sleep(200);
             }
