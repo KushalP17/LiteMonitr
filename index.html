@@ -122,7 +122,7 @@
                     await characteristic.writeValue(new Uint8Array([x]));
                     //sleep(100);
                     console.log('Value of ' + x + ' written successfully');
-                    console.log(characteristic.getValue());
+                    console.log(characteristic.readValue());
                     
                 } catch (error) {
                     console.error('Error writing:', error);
@@ -202,8 +202,8 @@
                     sendValue();
 
 
-                    console.log('Value of ' + R + ', ' + G + ', ' + B + ' written successfully');
-                    // console.log(characteristic.getValue());
+                    // console.log('Value of ' + R + ', ' + G + ', ' + B + ' written successfully');
+                    // console.log(characteristic.readValue());
                     
                 } catch (error) {
                     console.error('Error writing:', error);
@@ -295,7 +295,7 @@
                 if(cell.style.backgroundColor != selectedColor){
 
                     cell.style.backgroundColor = selectedColor;
-                    console.log("cell drawn @ " + cell.getAttribute("row") + ", " + cell.getAttribute("col"));
+                    // console.log("cell drawn @ " + cell.getAttribute("row") + ", " + cell.getAttribute("col"));
                     drawPixel(cell.getAttribute("row"), cell.getAttribute("col"), selectedColor);
                     cell.addEventListener('mouseover', handleCellHover);
                     document.addEventListener('mouseup', () => {
@@ -314,7 +314,7 @@
             event.preventDefault;
             if (isDrawing) {
                 const cell = event.target;
-                console.log("cell drawn @ " + cell.getAttribute("row") + ", " + cell.getAttribute("col"));
+                // console.log("cell drawn @ " + cell.getAttribute("row") + ", " + cell.getAttribute("col"));
                 drawPixel(cell.getAttribute("row"), cell.getAttribute("col"), selectedColor);
                 cell.style.backgroundColor = selectedColor;
             }

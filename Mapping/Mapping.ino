@@ -316,16 +316,20 @@ void loop() {
             uint8_t G = value[2];
             uint8_t B = value[3];
 
-            uint8_t row = 4;
-            uint8_t col = 5;
+            uint8_t rowIdx = 4;
+            uint8_t colIdx = 5;
 
             // Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String(row) + ", " + String(col));
 
-            while(value[row] < 32 && value[col] < 64 && row < 20 && col < 20) {
+            while(value[rowIdx] < 32 && value[colIdx] < 64 && rowIdx < 20 && colIdx < 20) {
 
-              setSinglePixel(value[row], value[col], R, G, B);
-              row += 2;
-              col += 2;
+              setSinglePixel(value[rowIdx], value[colIdx], R, G, B);
+              Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String(value[rowIdx]) + ", " + String(value[colIdx]));
+
+              rowIdx += 2;
+              colIdx += 2;
+
+              
             }
 
             ws2812b.show();
