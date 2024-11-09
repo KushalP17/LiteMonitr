@@ -311,30 +311,45 @@ void loop() {
                 draw64x32(stickman);
                 break;
             }
-          }else if(value.length() == 20 && value[0] == 37){
-            uint8_t R = value[1];
-            uint8_t G = value[2];
-            uint8_t B = value[3];
+          }else if(value.length() == 5){
+            uint8_t row = value[0];
+            //row = String(row).toInt();
+            uint8_t col = value[1];
+            //col = String(col).toInt();
+            uint8_t R = value[2];
+            //R = String(R).toInt();
+            uint8_t G = value[3];
+            //G = String(G).toInt();
+            uint8_t B = value[4];
+            //B = String(B).toInt();
+            Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String(row) + ", " + String(col));
+            drawSinglePixel(row,col,R,G,B);
+          }
+          
+          // }else if(value.length() == 20 && value[0] == 37){
+          //   uint8_t R = value[1];
+          //   uint8_t G = value[2];
+          //   uint8_t B = value[3];
 
-            uint8_t rowIdx = 4;
-            uint8_t colIdx = 5;
+          //   uint8_t rowIdx = 4;
+          //   uint8_t colIdx = 5;
 
-            // Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String(row) + ", " + String(col));
+          //   // Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String(row) + ", " + String(col));
 
-            while(value[rowIdx] < 32 && value[colIdx] < 64 && rowIdx < 20 && colIdx < 20) {
+          //   while(value[rowIdx] < 32 && value[colIdx] < 64 && rowIdx < 20 && colIdx < 20) {
 
-              setSinglePixel(value[rowIdx], value[colIdx], R, G, B);
-              Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String(value[rowIdx]) + ", " + String(value[colIdx]));
+          //     setSinglePixel(value[rowIdx], value[colIdx], R, G, B);
+          //     Serial.println("drawing (" + String(R) + ", " + String(G) + ", " + String(B) + " ) @ " + String((uint8_t)value[rowIdx]) + ", " + String((uint8_t)value[colIdx]));
 
-              rowIdx += 2;
-              colIdx += 2;
+          //     rowIdx += 2;
+          //     colIdx += 2;
 
               
-            }
+          //   }
 
-            ws2812b.show();
+          //   ws2812b.show();
 
-          }
+          // }
           // Reset the flag
             newDataAvailable = false;
         }

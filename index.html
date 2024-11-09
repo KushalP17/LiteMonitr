@@ -96,6 +96,9 @@
             try {
                 device = await navigator.bluetooth.requestDevice({
                     filters: [{ services: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b'] }]
+                    // filters: [{ namePrefix: "MyESP32", namePrefix: "LiteMonitr"}],
+                    // acceptAllDevices: true,
+                    // optionalServices: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b']
                 });
 
                 const server = await device.gatt.connect();
@@ -135,9 +138,13 @@
         async function sendValue() {
             while(BLEQueue.backIndex != BLEQueue.frontIndex){
                 let item = BLEQueue.dequeue();
-                await characteristic.writeValue(item);
+                try{
+                    await characteristic.writeValue(item);
+                } catch(error){
+                    BLEQueue.enqueue(item);
+                }
+                
                 console.log(item);
-                sleep(200);
             }
         }
 
@@ -149,7 +156,7 @@
             }
         }
 
-        setInterval(emptyArray, 200);
+        setInterval(emptyArray, 1500);
 
         async function writePixel(row, col, R, G, B) {
             if(characteristic && device.gatt.connected){            
@@ -226,7 +233,7 @@
 
         function activatePencil() {
             isPencilActive = true;
-            writeValue(8);
+            // writeValue(8);
         }
 
         function clearGrid() {
