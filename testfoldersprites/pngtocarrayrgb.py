@@ -1,7 +1,7 @@
 import os, sys
 from PIL import Image
 
-path = "C://Users//parek//Desktop//testfoldersprites"
+path = os.getcwd()
 
 f = open(path + "//header.h", "w")
 

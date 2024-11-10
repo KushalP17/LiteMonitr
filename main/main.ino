@@ -26,6 +26,7 @@ class MyServerCallbacks : public BLEServerCallbacks {
 
     void onDisconnect(BLEServer* pServer) {
         deviceConnected = false;
+        pServer->startAdvertising();
     }
 };
 
@@ -159,14 +160,6 @@ void setSinglePixel(uint8_t row, uint8_t col, uint8_t R, uint8_t G, uint8_t B){
   ws2812b.setPixelColor(pixel, ws2812b.Color(round(R*brightness), round(G*brightness), round(B*brightness)));
 }
 
-// int charToInt(char input){
-//   int output = 0;
-//   for(int i = 0; i < 8; i++){
-//     output += (input & ~(0x1<<i))<<i;
-//   }
-
-//   return output;
-// }
 
 void setup() {
 
@@ -185,7 +178,6 @@ void setup() {
 
   pCharacteristic->setCallbacks(new MyCallbacks());
 
-  // pCharacteristic->setValue("Hello World");
   pService->start();
 
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
@@ -235,14 +227,38 @@ void loop() {
           Serial.println("Cleared");
           break;
         case 1:
-          draw64x32(testimage);
-          Serial.println("testimage");
+          // draw64x32(testimage);
+          // Serial.println("testimage");
+          draw64x32(snake);
+          draw64x32(snake2);
+          draw64x32(snake3);
+          draw64x32(snake4);
+          draw64x32(snake5);
+          draw64x32(snake6);
+          draw64x32(snake7);
+          draw64x32(snake8);
+          draw64x32(snake9);
+          draw64x32(snake10);
+          draw64x32(snake11);
+
           break;
         case 2:
           draw64x32(mariospritetest);
           Serial.println("mariospritetest");
           break;
         case 3:
+          draw64x32(pacman);
+          draw64x32(pacman2);
+          draw64x32(pacman3);
+          draw64x32(pacman2);
+          draw64x32(pacman);
+          draw64x32(pacman2);
+          draw64x32(pacman3);
+          draw64x32(pacman2);
+          draw64x32(pacman);
+          draw64x32(pacman2);
+          draw64x32(pacman3);
+          draw64x32(pacman2);
           draw64x32(pacman);
           Serial.println("pacman");
           break;
