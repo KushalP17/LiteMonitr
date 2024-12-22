@@ -3,58 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="styles.css" rel="stylesheet">
     <title>ESP32 BLE App</title>
-    <style>
-        #grid {
-            display: grid;
-            grid-template-columns: repeat(32, 10px);
-            grid-template-rows: repeat(64, 10px);
-            gap: 1px;
-        }
-
-        .cell {
-            width: 10px;
-            height: 10px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            background-color: black;
-        }
-    </style>
 </head>
 <body>
-    <h1>ESP32 BLE App</h1>
-    <button onclick="connect()">Connect</button>
-    <button onclick="disconnect()">Disconnect</button>
-    <br>
-    <button onclick="writeValue(1)">Test Squiggle</button>
-    <br>
-    <button onclick="writeValue(2)">Mario Sprite</button>
-    <br>
-    <button onclick="writeValue(3)">Pacman</button>
-    <br>
-    <button onclick="writeValue(4)">Polka Dots</button>
-    <br>
-    <button onclick="writeValue(5)">Stickman</button>
-    <br>
-    <br>
-    <br>
-    <br>
-    <button onclick="writeValue(6)">Decrease Brightness</button>
-    <br>
-    <button onclick="writeValue(7)">Increase Brightness</button>
-    <br>
-    <!-- <button onclick="writeValue(256)">Test Button</button> -->
+
+    <div id="sidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="#">Draw</a>
+        <a href="#">Upload</a>
+        <a href="#">Presets</a>
+    </div>
+
+    <header>
+        <nav class="flex-container">
+            <div id="Side Menu" style="align-self: left;">
+                <button onclick="openNav()" style="font-size: 45px; text-align: left;">&#9776;</button>
+            </div>
+            <div id="WebsiteTitle" style="align-self: center">
+                <h1>
+                    <a href="https://kushalp17.github.io/LiteMonitr/" style="color: black; text-decoration: none;">LiteMonitr</a>
+                </h1>
+            </div>
+            <div id="BLEButtonContainer">
+                <div id="BLEButtons">
+                    <button onclick="disconnect()" id="disconnectButton"><img src="xbutton.png" alt="Disconnect"></button>
+                    <button onclick="connect()" id="connectButton"><img src="Bluetooth.png" alt="Connect" ></button>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
     <br>
     <br>
     <br>
     <br>
 
+    <div id="presetButtons" class="center">
+        <button onclick="writeValue(1)">Test Squiggle</button><br>
+        <button onclick="writeValue(2)">Mario Sprite</button><br>
+        <button onclick="writeValue(3)">Pacman</button><br>
+        <button onclick="writeValue(4)">Polka Dots</button><br>
+        <button onclick="writeValue(5)">Stickman</button><br>
+    </div>
 
-    <input type="color" id="colorPicker" value="#ffffff">
-    <button onclick="activatePencil()">Pencil</button>
-    <button onclick="clearGrid()">Clear Grid</button>
+    <div id="gridParamButton">
+        <input type="color" id="colorPicker" value="#ffffff">
+        <button onclick="activatePencil()">Pencil</button>
+        
+    </div>
 
-    <div id="grid"></div>
+    
+    <div id="displayContainer">
+
+        <div id="baseDisplayParams">
+            <div id="verticalParams">
+                <button onclick="clearGrid()">Clear Grid</button>
+                <div id="verticalSlider">
+                    <!-- image of sun -->
+                    <img src="brightnessicon.png">
+                    <div id="brightnessSliderContainer">
+                        <input type="range" orient="vertical" min="0" max="100" value="25" class="brightnessSlider">
+                        <!-- <button onclick="writeValue(6)">Decrease Brightness</button><br> -->
+                        <!-- <button onclick="writeValue(7)">Increase Brightness</button><br> -->
+                    </div>
+                </div>
+            </div>
+        </div> 
+        
+        <div id="grid"></div>
+    </div>
+
+    <!-- <div>
+        <canvas width="32" height="64" style="border:1px solid #000000"></canvas>
+    </div> -->
 
 
     <script>
@@ -348,6 +370,15 @@
 
         function updateSelectedColor() {
             selectedColor = document.getElementById('colorPicker').value;
+        }
+
+        function openNav() {
+            document.getElementById("sidenav").style.width = "45%";
+        }
+
+            /* Set the width of the side navigation to 0 */
+        function closeNav() {
+            document.getElementById("sidenav").style.width = "0";
         }
 
         // Initialize the grid when the page loads

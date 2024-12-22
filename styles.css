@@ -1,0 +1,144 @@
+div, h1 { 
+    text-align: center;
+    place-content: center;
+}
+
+#grid {
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(32, 10px);
+    grid-template-rows: repeat(64, 10px);
+    gap: 1px;
+}
+
+.cell {
+    margin: auto;
+    width: 10px;
+    height: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    background-color: black;
+}
+
+header {
+    position: absolute;
+    padding: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+nav.flex-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background-color: darkgoldenrod;
+    /* justify-content: space-between; */
+    /* align-items: center; */
+    justify-content: space-between;
+}
+
+nav.flex-container > * {
+    /* border: 2px solid purple; */
+    flex: 1 1 30%;
+}
+
+nav.flex-container > #Side Menu{
+    /* justify-self: left; */
+    justify-items: left;
+    -webkit-box-align: left;
+    padding-left: 5px;
+    margin-left: 0%;
+}
+
+nav.flex-container > #WebsiteTitle {
+    /* justify-self: center; */
+    width: 100px;
+}
+nav.flex-container > #BLEButtonContainer > #BLEButtons {
+    display: block;
+    margin-left: 45%;
+
+}
+
+/* .flex-container > div {
+} */
+
+button, input {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+}
+
+button > img {
+    width: 35px;
+    height: 35px;
+    margin: -5px;
+}
+
+#displayContainer {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#verticalSlider > img{
+    width: 35px;
+}
+
+.brightnessSliderContainer {
+    height: 100%;
+    width: 100%;
+}
+
+input[type=range][orient=vertical]{
+    writing-mode: vertical-lr;
+    direction: rtl;
+    appearance: slider-vertical;
+
+}
+
+.sidenav {
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 0;
+    text-align: left;
+    align-content:start;
+    justify-content: left;
+    background-color: #111; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+  }
+  
+  /* The navigation menu links */
+  .sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+  }
+  
+  /* When you mouse over the navigation links, change their color */
+  .sidenav a:hover {
+    color: #f1f1f1;
+  }
+  
+  /* Position and style the close button (top right corner) */
+  .sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+  }
+  
+
+
+
